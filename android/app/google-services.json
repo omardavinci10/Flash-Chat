@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "639132161362",
+    "project_id": "flash-chat-f3c14",
+    "storage_bucket": "flash-chat-f3c14.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:639132161362:android:6b793c381f5515cce4568b",
+        "android_client_info": {
+          "package_name": "co.Davinci.flash_chat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "639132161362-o31ppvo42tddbrjakpbnoamg8m40c6c9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK5bOMPF_aDX4GMSBbw8m0CCY8JOsugvU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "639132161362-o31ppvo42tddbrjakpbnoamg8m40c6c9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
