@@ -2,9 +2,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 final _firestore = FirebaseFirestore.instance;
 User loggedInUser;
+
+String reverse(String s) {
+  StringBuffer sb = new StringBuffer();
+  for (int i = s.length - 1; i >= 0; i--) {
+    sb.write(s[i]);
+  }
+  return sb.toString();
+}
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -17,6 +26,8 @@ class _ChatScreenState extends State<ChatScreen> {
   final messageTextController = TextEditingController();
   final _auth = FirebaseAuth.instance;
   String messageText;
+  String messageTime;
+  String messageDate;
 
   @override
   void initState() {
@@ -78,8 +89,14 @@ class _ChatScreenState extends State<ChatScreen> {
                   FlatButton(
                     onPressed: () {
                       //Implement send functionality.
+                      var currTime = DateTime.now();
+                      print(currTime);
+                      messageTime = DateFormat.Hms().format(currTime);
+                      messageDate = DateFormat('yyyy/MM/dd').format(currTime);
                       _firestore.collection('messages').add({
                         'text': messageText,
+                        'time': messageTime,
+                        'date': messageDate,
                         'senderEmail': loggedInUser.email,
                         'senderDisplayName': loggedInUser.displayName,
                       });
@@ -113,21 +130,27 @@ class MessagesStream extends StatelessWidget {
             ),
           );
         }
-        final messages = snapshot.data.docs.reversed;
+        final messages = snapshot.data.docs;
         List<MessageBubble> messageBubbles = [];
         for (var message in messages) {
           final messageText = message['text'];
+          final messageTime = message['time'];
+          final messageDate = message['date'];
           final messageSenderEmail = message['senderEmail'];
           final messageSenderDisplayName = message['senderDisplayName'];
           final currentUser = loggedInUser.email;
 
           final messageBubble = MessageBubble(
+            time: messageTime,
+            date: messageDate,
             text: messageText,
             senderDisplayName: messageSenderDisplayName,
             isMe: currentUser == messageSenderEmail,
           );
           messageBubbles.add(messageBubble);
         }
+        messageBubbles.sort((a, b) => a.compareTo(b.time, b.date));
+        messageBubbles = List.from(messageBubbles.reversed);
         return Expanded(
           child: ListView(
             reverse: true,
@@ -143,12 +166,69 @@ class MessagesStream extends StatelessWidget {
 class MessageBubble extends StatelessWidget {
   final String senderDisplayName;
   final String text;
+  final String time;
+  final String date;
   final bool isMe;
 
-  MessageBubble({this.text, this.senderDisplayName, this.isMe});
+  MessageBubble(
+      {this.text, this.time, this.date, this.senderDisplayName, this.isMe});
+
+  int compareTo(String bTime, String bDate) {
+    List<int> myTime = time.split(':').map(int.parse).toList();
+    List<int> passedTime = bTime.split(':').map(int.parse).toList();
+    List<int> myDate = date.split('/').map(int.parse).toList();
+    List<int> passedDate = bDate.split('/').map(int.parse).toList();
+
+    if (myDate[0] == passedDate[0]) {
+      //same year
+      if (myDate[1] == passedDate[1]) {
+        //same month
+        if (myDate[2] == passedDate[2]) {
+          //same day
+          if (myTime[0] == passedTime[0]) {
+            //same hour
+            if (myTime[1] == passedTime[1]) {
+              //same minute
+              if (myTime[2] == passedTime[2]) {
+                //same second
+                return 0;
+              } else if (myTime[2] < passedTime[2]) {
+                return -1;
+              } else {
+                return 1;
+              }
+            } else if (myTime[1] < passedTime[1]) {
+              return -1;
+            } else {
+              return 1;
+            }
+          } else if (myTime[0] < passedTime[0]) {
+            return -1;
+          } else {
+            return 1;
+          }
+        } else if (myDate[2] < passedDate[2]) {
+          return -1;
+        } else {
+          return 1;
+        }
+      } else if (myDate[1] < passedDate[1]) {
+        return -1;
+      } else {
+        return 1;
+      }
+    } else if (myDate[0] < passedDate[0]) {
+      return -1;
+    } else {
+      return 1;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    List<int> myTime = time.split(':').map(int.parse).toList();
+    List<int> myDate = date.split('/').map(int.parse).toList();
+
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Column(
@@ -187,6 +267,14 @@ class MessageBubble extends StatelessWidget {
                   fontSize: 15.0,
                 ),
               ),
+            ),
+          ),
+          Text(
+            DateFormat.jm().format(DateTime(myDate[0], myDate[1], myDate[2],
+                myTime[0], myTime[1], myTime[2])),
+            style: TextStyle(
+              fontSize: 12.0,
+              color: Colors.black54,
             ),
           ),
         ],
