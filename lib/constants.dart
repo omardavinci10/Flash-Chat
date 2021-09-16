@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 const kSendButtonTextStyle = TextStyle(
   color: Colors.lightBlueAccent,
@@ -16,6 +17,7 @@ const kMessageContainerDecoration = BoxDecoration(
   border: Border(
     top: BorderSide(color: Colors.lightBlueAccent, width: 2.0),
   ),
+  color: Colors.white,
 );
 
 const kTextFieldDecoration = InputDecoration(
@@ -32,4 +34,30 @@ const kTextFieldDecoration = InputDecoration(
     borderSide: BorderSide(color: Colors.blueAccent, width: 2.0),
     borderRadius: BorderRadius.all(Radius.circular(32.0)),
   ),
+);
+
+var alertStyle = AlertStyle(
+  animationType: AnimationType.grow,
+  isCloseButton: false,
+  isOverlayTapDismiss: false,
+  descStyle: TextStyle(fontWeight: FontWeight.bold),
+  descTextAlign: TextAlign.start,
+  animationDuration: Duration(milliseconds: 500),
+  alertBorder: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(0.0),
+    side: BorderSide(
+      color: Colors.grey,
+    ),
+  ),
+  titleStyle: TextStyle(
+    color: Colors.red,
+  ),
+  alertAlignment: Alignment.center,
+);
+
+const kTextStyleHelpCenter = TextStyle(
+  fontWeight: FontWeight.bold,
+  fontSize: 15.0,
+  color: Colors.black,
+  height: 2,
 );

@@ -3,17 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 final _firestore = FirebaseFirestore.instance;
 User loggedInUser;
-
-String reverse(String s) {
-  StringBuffer sb = new StringBuffer();
-  for (int i = s.length - 1; i >= 0; i--) {
-    sb.write(s[i]);
-  }
-  return sb.toString();
-}
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -29,11 +22,25 @@ class _ChatScreenState extends State<ChatScreen> {
   String messageTime;
   String messageDate;
 
+  Icon lightIcon = Icon(
+    Icons.radio_button_off,
+    color: Colors.white,
+  );
+  Icon darkIcon = Icon(
+    Icons.lens,
+    color: Colors.blueGrey,
+  );
+
+  Color myBackgroundColor;
+  Icon myIcon;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getCurrentUser();
+    myBackgroundColor = lightIcon.color;
+    myIcon = darkIcon;
   }
 
   void getCurrentUser() {
@@ -44,73 +51,104 @@ class _ChatScreenState extends State<ChatScreen> {
         loggedInUser = user;
       }
     } catch (e) {
-      print(e);
+      Alert(
+        context: context,
+        style: alertStyle,
+        type: AlertType.info,
+        title: "User error",
+        desc:
+            "Either you\'ve been signed out or error in connection occurred, try re-logging.",
+        buttons: [
+          DialogButton(
+            child: Text(
+              "Ok",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+            color: Color.fromRGBO(0, 179, 134, 1.0),
+            radius: BorderRadius.circular(0.0),
+          ),
+        ],
+      ).show();
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: null,
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.close),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: myBackgroundColor,
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              icon: myIcon,
               onPressed: () {
-                //Implement logout functionality
-                _auth.signOut();
-                Navigator.pop(context);
-              }),
-        ],
-        title: Text('⚡️Chat'),
-        backgroundColor: Colors.lightBlueAccent,
-      ),
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            MessagesStream(),
-            Container(
-              decoration: kMessageContainerDecoration,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      controller: messageTextController,
-                      onChanged: (value) {
-                        //Do something with the user input.
-                        messageText = value;
-                      },
-                      decoration: kMessageTextFieldDecoration,
-                    ),
-                  ),
-                  FlatButton(
-                    onPressed: () {
-                      //Implement send functionality.
-                      var currTime = DateTime.now();
-                      print(currTime);
-                      messageTime = DateFormat.Hms().format(currTime);
-                      messageDate = DateFormat('yyyy/MM/dd').format(currTime);
-                      _firestore.collection('messages').add({
-                        'text': messageText,
-                        'time': messageTime,
-                        'date': messageDate,
-                        'senderEmail': loggedInUser.email,
-                        'senderDisplayName': loggedInUser.displayName,
-                      });
-                      messageTextController.clear();
-                    },
-                    child: Text(
-                      'Send',
-                      style: kSendButtonTextStyle,
-                    ),
-                  ),
-                ],
-              ),
+                setState(() {
+                  myBackgroundColor = myBackgroundColor == lightIcon.color
+                      ? darkIcon.color
+                      : lightIcon.color;
+                  myIcon = myIcon == lightIcon ? darkIcon : lightIcon;
+                });
+              },
             ),
+            IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  //Implement logout functionality
+                  _auth.signOut();
+                  Navigator.pop(context);
+                }),
           ],
+          title: Text('⚡️Chat'),
+          backgroundColor: Colors.lightBlueAccent,
+        ),
+        body: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              MessagesStream(),
+              Container(
+                decoration: kMessageContainerDecoration,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        controller: messageTextController,
+                        onChanged: (value) {
+                          //Do something with the user input.
+                          messageText = value;
+                        },
+                        decoration: kMessageTextFieldDecoration,
+                      ),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        //Implement send functionality.
+                        var currTime = DateTime.now();
+                        print(currTime);
+                        messageTime = DateFormat.Hms().format(currTime);
+                        messageDate = DateFormat('yyyy/MM/dd').format(currTime);
+                        _firestore.collection('messages').add({
+                          'text': messageText,
+                          'time': messageTime,
+                          'date': messageDate,
+                          'senderEmail': loggedInUser.email,
+                          'senderDisplayName': loggedInUser.displayName,
+                        });
+                        messageTextController.clear();
+                      },
+                      child: Text(
+                        'Send',
+                        style: kSendButtonTextStyle,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -242,6 +280,9 @@ class MessageBubble extends StatelessWidget {
               color: Colors.black54,
             ),
           ),
+          SizedBox(
+            height: 5.0,
+          ),
           Material(
             borderRadius: isMe
                 ? BorderRadius.only(
@@ -268,6 +309,9 @@ class MessageBubble extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+          SizedBox(
+            height: 5.0,
           ),
           Text(
             DateFormat.jm().format(DateTime(myDate[0], myDate[1], myDate[2],
