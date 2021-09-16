@@ -144,7 +144,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             await _auth.createUserWithEmailAndPassword(
                                 email: email, password: password);
                         if (newUser != null) {
-                          _auth.currentUser.updateDisplayName(displayName);
+                          await _auth.currentUser
+                              .updateDisplayName(displayName);
                           setState(() {
                             showSpinner = false;
                           });
