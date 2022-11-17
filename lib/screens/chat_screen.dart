@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flash_chat/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat/constants.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -123,7 +123,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         decoration: kMessageTextFieldDecoration,
                       ),
                     ),
-                    FlatButton(
+                    TextButton(
                       onPressed: () {
                         //Implement send functionality.
                         var currTime = DateTime.now();
