@@ -169,6 +169,7 @@ int layout notification_template_custom_big 0x7f0e0004
 int layout notification_template_icon_group 0x7f0e0005
 int layout notification_template_part_chronometer 0x7f0e0006
 int layout notification_template_part_time 0x7f0e0007
+int raw firebase_common_keep 0x7f130001
 int string common_google_play_services_unknown_issue 0x7f140001
 int string status_bar_notification_info_overflow 0x7f140002
 int style TextAppearance_Compat_Notification 0x7f150001
