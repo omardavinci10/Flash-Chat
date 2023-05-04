@@ -1,4 +1,0 @@
-# Referenced at E:\CUFE\Senior-2\Flutter\Flash-Chat\build\app\intermediates\merged_manifests\debug\AndroidManifest.xml:23
--keep class android.app.Application { <init>(); }
-# Referenced at E:\CUFE\Senior-2\Flutter\Flash-Chat\build\app\intermediates\merged_manifests\debug\AndroidManifest.xml:23
--keep class androidx.core.app.CoreComponentFactory { <init>(); }
